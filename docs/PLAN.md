@@ -28,10 +28,10 @@ Create a web-based URL shortener application where authenticated users can:
 ### Phase 1: Core Architecture & Setup
 
 - [x] Define technology stack (frontend, backend, database)
-- [ ] Set up project structure and initialize repositories
-- [ ] Configure development environment
-- [ ] Set up version control
-- [ ] Define database schema for users, URLs, and metadata
+- [x] Set up project structure and initialize repositories
+- [x] Configure development environment
+- [x] Set up version control
+- [x] Define database schema for users, URLs, and metadata
 - [ ] Set up environment variables and configuration management
 
 ### Phase 2: Authentication System

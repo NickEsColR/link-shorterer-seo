@@ -265,67 +265,14 @@ Users (id, email, name, createdAt)
 
 ## 🚀 Initial Setup
 
-### 1. Create Prisma Schema
-
-```prisma
-// prisma/schema.prisma
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
-}
-
-model User {
-  id        String   @id // Clerk ID
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  urls      Url[]
-  
-  @@map("users")
-}
-
-model Url {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  originalUrl String    @db.Text
-  shortCode   String    @unique @db.VarChar(10)
-  createdAt   DateTime  @default(now())
-  expiresAt   DateTime?
-  isActive    Boolean   @default(true)
-  metadata    Metadata?
-  
-  @@index([userId])
-  @@index([shortCode])
-  @@map("urls")
-}
-
-model Metadata {
-  id          String @id @default(cuid())
-  urlId       String @unique
-  url         Url    @relation(fields: [urlId], references: [id], onDelete: Cascade)
-  title       String @db.VarChar(255)
-  description String @db.Text
-  imageUrl    String @db.Text
-  updatedAt   DateTime @updatedAt
-  
-  @@map("metadata")
-}
-```
-
-### 2. Run Migration
+### 1. Run Migration
 
 ```bash
 npx prisma migrate dev --name init
 npx prisma generate
 ```
 
-### 3. Configure Clerk
+### 2. Configure Clerk
 
 ```typescript
 // middleware.ts

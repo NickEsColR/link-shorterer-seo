@@ -1,8 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Prisma Schema for URL Shortener with SEO
+// Database: PostgreSQL
+// Version: Prisma 7.3.0
 
 generator client {
   provider = "prisma-client"
@@ -11,4 +9,61 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  // Note: URL is configured in prisma.config.ts for Prisma 7+
+}
+
+// User model - synced with Clerk authentication
+model User {
+  id        String   @id // Clerk user ID
+  email     String   @unique
+  name      String?
+  imageUrl  String?  // Profile image from Clerk
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  urls      Url[]
+  
+  @@map("users")
+}
+
+// URL model - stores shortened URLs
+model Url {
+  id          String    @id @default(cuid())
+  userId      String
+  originalUrl String    @db.Text
+  shortCode   String    @unique @db.VarChar(10)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  expiresAt   DateTime?
+  isActive    Boolean   @default(true)
+  clickCount  Int       @default(0)
+  
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metadata    Metadata?
+  
+  // Indexes for performance
+  @@index([userId])
+  @@index([shortCode])
+  @@index([createdAt])
+  @@map("urls")
+}
+
+// Metadata model - stores Open Graph metadata for SEO
+model Metadata {
+  id          String   @id @default(cuid())
+  urlId       String   @unique
+  title       String   @db.VarChar(255)
+  description String?  @db.Text
+  imageUrl    String?  @db.Text
+  favicon     String?  @db.Text
+  siteName    String?  @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  url         Url      @relation(fields: [urlId], references: [id], onDelete: Cascade)
+  
+  @@map("metadata")
 }
